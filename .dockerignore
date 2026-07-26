@@ -1,0 +1,7 @@
+.git
+.claude
+venv
+__pycache__
+.env
+config.ini
+voice_settings.db

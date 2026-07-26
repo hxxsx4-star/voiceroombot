@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# 로컬 전용 (커밋 금지)
+
+# 로컬 전용 (커밋 금지)
+# config.ini 에는 봇 토큰이 들어있고, DB 는 공유 볼륨에서 관리한다.
+config.ini
+voice_settings.db
