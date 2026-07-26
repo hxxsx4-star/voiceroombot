@@ -8,6 +8,8 @@ import traceback
 import urllib.request
 from dotenv import load_dotenv
 
+from cmdexport import export_commands
+
 # .env 파일 로드
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -115,6 +117,8 @@ class TempVCBot(discord.Client):
         self.add_view(RoomPanelView())
         # 슬래시 명령어를 디스코드에 동기화
         await self.tree.sync()
+        n = export_commands(self, "voicebot", "음성방봇")
+        print(f"📖 명령어 {n}개를 봇공지용으로 내보냈습니다.")
 
     async def on_error(self, event_method, *args, **kwargs):
         # 이벤트 핸들러 내부 예외는 봇을 죽이지 않고 여기로 넘어옵니다.
