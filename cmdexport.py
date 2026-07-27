@@ -12,9 +12,27 @@ SHARED_DIR = os.environ.get("ARENA_SHARED_DIR", "/home/hxxsx4/shared_data")
 CMD_DIR = os.path.join(SHARED_DIR, "commands")
 
 
+def _required(cmd) -> str:
+    """이 명령어를 쓰려면 어떤 권한/역할이 필요한지 사람이 읽을 문구로."""
+    perms = getattr(cmd, "default_permissions", None)
+    if perms:
+        if getattr(perms, "administrator", False):
+            return "관리자 권한"
+        if getattr(perms, "manage_guild", False):
+            return "서버 관리 권한"
+        if getattr(perms, "manage_messages", False):
+            return "메시지 관리 권한"
+        return "특정 권한"
+    # 데코레이터 없이 본문에서 검사하는 경우는 checks 로 확인
+    for chk in getattr(cmd, "checks", []):
+        名 = getattr(chk, "__qualname__", "")
+        if "has_permissions" in 名:
+            return "관리자 권한"
+    return ""
+
+
 def _walk(cmd, prefix=""):
     """그룹 명령어는 하위 명령까지 펼쳐서 기록한다."""
-    import discord
     from discord import app_commands
 
     name = f"{prefix}{cmd.name}"
@@ -22,11 +40,12 @@ def _walk(cmd, prefix=""):
         for sub in cmd.commands:
             yield from _walk(sub, prefix=f"{name} ")
     else:
+        need = _required(cmd)
         yield {
             "name": name,
             "description": getattr(cmd, "description", "") or "",
-            # 관리자 전용 여부 (기본 권한이 걸려 있으면 표시)
-            "admin": bool(getattr(cmd, "default_permissions", None)),
+            "admin": bool(need),
+            "requires": need,
         }
 
 
